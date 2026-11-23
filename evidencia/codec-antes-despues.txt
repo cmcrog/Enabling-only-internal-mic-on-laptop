@@ -1,0 +1,69 @@
+Evidencia del códec Realtek ALC257 — antes y después
+=====================================================
+Equipo: Debian forky/sid, kernel 7.3.4+deb14-amd64
+Tarjeta: 1 [Generic_1] HDA-Intel (pci-0000_06_00.6)
+Códec:   Realtek ALC257
+
+El ADC que captura es el nodo 0x08. Su fuente es el mezclador 0x23.
+El mezclador 0x23 tiene 6 entradas:
+
+    idx 0 = 0x18
+    idx 1 = 0x19  -> jack de micrófono externo
+    idx 2 = 0x1a
+    idx 3 = 0x1b
+    idx 4 = 0x1d
+    idx 5 = 0x12  -> micrófono interno (Pin Default 0x90a60120 [Fixed] Mic at Int)
+
+Formato de Amp-In vals: 0x80 = muteado, 0x00 = abierto.
+
+
+ANTES (estado de fábrica / driver)
+----------------------------------
+Lectura directa con hda-verb:
+
+    Node 0x23, índice 1 (0x19, externo): 0x0   -> ABIERTO
+    Node 0x23, índice 5 (0x12, interno): 0x80  -> MUTEADO
+
+Dump del codec:
+
+    Node 0x23 [Audio Mixer] wcaps 0x20010b: Stereo Amp-In
+      Amp-In vals:  [0x80 0x80] [0x00 0x00] [0x80 0x80] [0x80 0x80] [0x80 0x80] [0x80 0x80]
+      Connection: 6
+         0x18 0x19 0x1a 0x1b 0x1d 0x12
+
+    Node 0x24 [Audio Selector] wcaps 0x300101: Stereo
+      Connection: 2
+         0x12* 0x13
+
+Conclusión: el hardware capturaba del pin externo (0x19) y el interno
+(0x12) estaba silenciado. Ningún control ALSA expone ese mezclador.
+
+
+DESPUÉS (arreglo aplicado)
+--------------------------
+    Node 0x23 [Audio Mixer] wcaps 0x20010b: Stereo Amp-In
+      Amp-In vals:  [0x80 0x80] [0x80 0x80] [0x80 0x80] [0x80 0x80] [0x80 0x80] [0x00 0x00]
+      Connection: 6
+         0x18 0x19 0x1a 0x1b 0x1d 0x12
+
+    Node 0x24 [Audio Selector] wcaps 0x300101: Stereo
+      Connection: 2
+         0x12* 0x13
+
+Conclusión: solo la entrada 5 (0x12, micrófono interno) queda abierta;
+todas las demás están muteadas. El selector 0x24 apunta a 0x12.
+
+
+Comandos usados para comprobar
+------------------------------
+    # Ver el mezclador y el selector
+    awk '/^Node 0x23 /{f=1} f{print} f && /^Node / && !/^Node 0x23 /{exit}' \
+        /proc/asound/card1/codec#0
+    awk '/^Node 0x24 /{f=1} f{print} f && /^Node / && !/^Node 0x24 /{exit}' \
+        /proc/asound/card1/codec#0
+
+    # Lectura/escritura directa (requiere root: CAP_SYS_RAWIO)
+    sudo /usr/local/sbin/hda-verb /dev/snd/hwC1D0 0x23 0xb00 0x0005
+    sudo /usr/local/sbin/hda-verb /dev/snd/hwC1D0 0x23 0x300 0x7500
+    sudo /usr/local/sbin/hda-verb /dev/snd/hwC1D0 0x23 0x300 0x7180
+    sudo /usr/local/sbin/hda-verb /dev/snd/hwC1D0 0x24 0x701 0x0

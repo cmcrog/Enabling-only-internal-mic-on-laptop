@@ -1,0 +1,57 @@
+Pruebas de ganancia — micrófono interno (ALC257)
+=================================================
+
+El volumen de PipeWire NO controla linealmente el "Capture Volume" de ALSA.
+Primero mueve el "Internal Mic Boost Volume" (0..3 pasos de +10 dB) y, una
+vez agotado, ajusta "Capture Volume" (0..63, paso 0.75 dB).
+
+Mapeo medido (pactl set-source-volume -> controles ALSA):
+
+    Volumen PipeWire    Internal Mic Boost    Capture Volume
+    ----------------    ------------------    --------------
+    0 %                 0 dB (0)              0
+    5 %                 0 dB (0)              0
+    10 %                0 dB (0)              23
+    15 %                0 dB (0)              37
+    20 %                0 dB (0)              47
+    25 %                0 dB (0)              54
+    30 %                0 dB (0)              61
+    35 %                0 dB (0)              63
+    40 %                0 dB (0)              63
+    45 %                0 dB (0)              63
+    50 %                +10 dB (1)            63
+    55 %                +10 dB (1)            63
+    60 %                +10 dB (1)            63
+    65 %                +10 dB (1)            63
+    70 %                +20 dB (2)            63
+    75 %                +20 dB (2)            63
+    80 %                +20 dB (2)            63
+    85 %                +20 dB (2)            63
+    90 %                +20 dB (2)            63
+    95 %                +20 dB (2)            63
+    100 %               +30 dB (3)            63
+
+
+Pruebas de grabación (parec, 48 kHz, s16le, estéreo, ambiente silencioso):
+
+    Volumen   Boost   Capture   RMS dBFS   Pico dBFS   Clipping
+    -------   -----   -------   --------   ---------   --------
+    25 %      0       54        -42.2      -27.1       no
+    30 %      0       61        -39.2      -24.9       no
+    35 %      0       63        -29.6       -1.3       no
+
+Notas:
+- Con 35 % el pico queda a -1.3 dBFS: demasiado cerca del límite; cualquier
+  golpe de voz saturaría. Por eso el valor permanente es 30 %.
+- Con 100 % (boost +30 dB) la captura saturaba por completo:
+  RMS -3.3 dBFS y decenas de miles de muestras recortadas.
+- El ajuste final es 30 % => boost 0 dB + Capture Volume 61, sin clipping.
+
+
+Valores aplicados por ~/bin/set-internal-mic.sh
+-----------------------------------------------
+    pactl set-source-volume "$INTERNAL_MIC" 30%
+    # equivale a:
+    #   Internal Mic Boost Volume = 0,0
+    #   Capture Volume            = 61,61
+    #   Capture Switch            = on,on

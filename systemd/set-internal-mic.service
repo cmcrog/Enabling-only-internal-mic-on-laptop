@@ -1,0 +1,11 @@
+[Unit]
+Description=Set Internal Microphone as Default
+After=pipewire.service wireplumber.service
+
+[Service]
+Type=oneshot
+ExecStart=%h/bin/set-internal-mic.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=default.target

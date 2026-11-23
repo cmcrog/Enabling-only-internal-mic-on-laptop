@@ -1,0 +1,13 @@
+[Unit]
+Description=Reapply internal microphone routing when PipeWire captures
+After=pipewire.service wireplumber.service
+Wants=pipewire.service wireplumber.service
+
+[Service]
+Type=simple
+ExecStart=%h/bin/mic-watch.sh
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=default.target

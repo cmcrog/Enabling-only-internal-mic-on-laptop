@@ -1,0 +1,11 @@
+#!/bin/bash
+# Reaplica el enrutado del micrófono interno al volver de suspensión.
+# Con los verbos registrados en init_verbs el driver ya restaura el estado al
+# despertar el códec; esto es una red de seguridad adicional y no toca el
+# ahorro de energía.
+case "$1" in
+    post)
+        /usr/local/sbin/fix-internal-mic.sh
+        ;;
+esac
+exit 0

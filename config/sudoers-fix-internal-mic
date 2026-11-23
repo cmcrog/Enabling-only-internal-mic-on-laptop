@@ -1,0 +1,3 @@
+# Permite al usuario ejecutar SOLO el helper del micrófono sin contraseña.
+# El archivo real se instala en /etc/sudoers.d/fix-internal-mic (modo 0440).
+<usuario> ALL=(root) NOPASSWD: /usr/local/sbin/fix-internal-mic.sh

@@ -1,0 +1,72 @@
+=== Fecha de la evidencia ===
+2026-11-22T23:01:06-05:00
+
+=== Tarjeta y codec ===
+ 0 [Generic        ]: HDA-Intel - HD-Audio Generic
+                      HD-Audio Generic at 0xd13c8000 irq 79
+ 1 [Generic_1      ]: HDA-Intel - HD-Audio Generic
+                      HD-Audio Generic at 0xd13c0000 irq 80
+
+Codec: Realtek ALC257
+
+=== Node 0x23 (Audio Mixer que alimenta el ADC) ===
+Node 0x23 [Audio Mixer] wcaps 0x20010b: Stereo Amp-In
+  Amp-In caps: ofs=0x00, nsteps=0x00, stepsize=0x00, mute=1
+  Amp-In vals:  [0x80 0x80] [0x80 0x80] [0x80 0x80] [0x80 0x80] [0x80 0x80] [0x00 0x00]
+  Connection: 6
+     0x18 0x19 0x1a 0x1b 0x1d 0x12
+Node 0x24 [Audio Selector] wcaps 0x300101: Stereo
+
+=== Node 0x24 (Audio Selector) ===
+Node 0x24 [Audio Selector] wcaps 0x300101: Stereo
+  Connection: 2
+     0x12* 0x13
+
+=== Pines internos/externos ===
+Node 0x12 [Pin Complex] wcaps 0x40040b: Stereo Amp-In
+  Pincap 0x00000020: IN
+  Pin Default 0x90a60120: [Fixed] Mic at Int N/A
+Node 0x13 [Pin Complex] wcaps 0x40040b: Stereo Amp-In
+Node 0x19 [Pin Complex] wcaps 0x40048b: Stereo Amp-In
+  Pincap 0x00003724: IN Detect
+  Pin Default 0x04a11030: [Jack] Mic at Ext Right
+Node 0x1a [Pin Complex] wcaps 0x40048b: Stereo Amp-In
+
+=== Estado de PipeWire (fuente) ===
+alsa_input.pci-0000_06_00.6.analog-stereo
+	Mute: no
+	Volume: front-left: 19660 /  30% / -31.37 dB,   front-right: 19660 /  30% / -31.37 dB
+	Base Volume: 6554 /  10% / -60.00 dB
+		analog-input-internal-mic: Internal Microphone (type: Mic, priority: 8900, availability group: Legacy 1, availability unknown)
+		analog-input-mic: Microphone (type: Mic, priority: 8700, availability group: Legacy 1, availability unknown)
+	Active Port: analog-input-internal-mic
+
+=== Puertos de la tarjeta ===
+	Active Profile: output:analog-stereo+input:analog-stereo
+		analog-input-internal-mic: Internal Microphone (type: Mic, priority: 8900, latency offset: 0 usec, availability group: Legacy 1, availability unknown)
+		analog-input-mic: Microphone (type: Mic, priority: 8700, latency offset: 0 usec, availability group: Legacy 1, availability unknown)
+
+=== Ruta de WirePlumber ===
+node=50
+Routes for node 50 (parent device 82: Ryzen HD Audio Controller):
+Active profile index: 1 (Analog Stereo Duplex)
+Reported Route assignments:
+  logical device 0	[Audio/Source, node 50: Ryzen HD Audio Controller Analog Stereo]
+	└─<─ route 0	(profile 1: Analog Stereo Duplex)
+Available route choices:
+ * 0  [INPUT]  Internal Microphone [unknown]  prio=8900
+   1  [INPUT]  Microphone [unknown]  prio=8700
+
+=== Controles ALSA visibles ===
+  ; type=INTEGER,access=rw---R--,values=2,min=0,max=3,step=0
+  : values=0,0
+  | dBscale-min=0.00dB,step=10.00dB,mute=0
+  ; type=INTEGER,access=rw---R--,values=2,min=0,max=63,step=0
+  : values=61,61
+  | dBscale-min=-17.25dB,step=0.75dB,mute=0
+  ; type=BOOLEAN,access=rw------,values=2
+  : values=on,on
+
+=== Servicios ===
+fix-internal-mic.service: enabled/active
+set-internal-mic.service: enabled/active
